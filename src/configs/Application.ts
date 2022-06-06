@@ -7,6 +7,7 @@ export type RootStackParamList = {
   Register: undefined;
   Home: undefined;
   ForgotPassword: undefined;
+  CreateNote: undefined;
 };
 
 export default class Application {

@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword, updateEmail, updateProfile, User
 } from "firebase/auth";
+import Logger from "../handlers/Logger";
 
 type UserProfile = {
   displayName?: string | null | undefined;
@@ -36,19 +37,20 @@ interface ForgotPasswordProps extends PromiseCallbacks {
 }
 
 export default class AccountManager {
-  public static async getUserProfile() {
+  public static getUserProfile() {
     return getAuth().currentUser;
   }
-  public static async isUserLoggedIn() {
+  public static isUserLoggedIn() {
     return AccountManager.getUserProfile() !== null;
   }
-  public static async hasSession(callback: (user: User) => void) {
-    if(await AccountManager.isUserLoggedIn()) {
-      callback(await AccountManager.getUserProfile() as User);
+  public static hasSession(callback: (user: User) => void) {
+    if(AccountManager.isUserLoggedIn()) {
+      Logger.log('userProfile', AccountManager.getUserProfile(), 'Account logged in', AccountManager.isUserLoggedIn());
+      callback(AccountManager.getUserProfile() as User);
     }
   }
-  public static async hasNoSession(callback: () => void) {
-    if(!await AccountManager.isUserLoggedIn()) {
+  public static hasNoSession(callback: () => void) {
+    if(!AccountManager.isUserLoggedIn()) {
       callback();
     }
   }
@@ -77,8 +79,8 @@ export default class AccountManager {
       onError && onError(error);
     });
   }
-  public static userSignOut() {
-    getAuth().signOut();
+  public static async userSignOut() {
+    return await getAuth().signOut();
   }
   public static handleAuthStateChanged({
     hasSession = (user) => {},

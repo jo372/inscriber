@@ -7,18 +7,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationOptions } from "@react-navigation/stack";
 import { getReactNativePersistence, initializeAuth } from "firebase/auth/react-native";
+import { getFirestore } from "firebase/firestore";
 import * as React from 'react';
 import { useEffect } from "react";
 import { RootStackParamList } from "./src/configs/Application";
 import { FirebaseConfig } from "./src/configs/FirebaseConfig";
-import DatabaseHelper from "./src/lib/handlers/DatabaseHandler";
 import AccountManager from "./src/lib/managers/AccountManager";
+import CreateNoteScreen from "./src/screens/createNote/CreateNoteScreen";
 import FirstTimeSetupScreen from "./src/screens/firstTimeSetup/FirstTimeSetupScreen";
 import ForgotPasswordScreen from "./src/screens/forgotPassword/ForgotPasswordScreen";
 import HomeScreen from "./src/screens/home/Home";
 import LoginScreen from "./src/screens/login/LoginScreen";
 import SignUpScreen from "./src/screens/signup/SignUpScreen";
-
+  
 const firebaseConfig: FirebaseConfig = new FirebaseConfig({
   apiKey: API_KEY,
   authDomain: AUTH_DOMAIN,
@@ -29,9 +30,10 @@ const firebaseConfig: FirebaseConfig = new FirebaseConfig({
 });
 
 const Stack = createStackNavigator<RootStackParamList>();
+const defaultApp = initializeApp(firebaseConfig.toJSON());
+export const db = getFirestore(defaultApp);
 
 if(getApps().length === 0) {
-  const defaultApp = initializeApp(firebaseConfig.toJSON());
   initializeAuth(defaultApp, {
     persistence: getReactNativePersistence(AsyncStorage)
   })
@@ -41,15 +43,12 @@ const defaultStackNavigationOptions : StackNavigationOptions = {
   title: ""
 }
 
+
 export default function App() {
   
   const [initialRouteName, setInitialRouteName] = React.useState<keyof RootStackParamList>("FirstTimeSetup");
  
   useEffect(() => {
-    const db = DatabaseHelper.getInstance();
-    
-    db.setupDatabase();
-  
     AccountManager.handleAuthStateChanged({
       hasSession: () => {
         setInitialRouteName("Home");
@@ -69,6 +68,7 @@ export default function App() {
             headerShown: false,
           }}/>
           <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={defaultStackNavigationOptions}/>
+          <Stack.Screen name="CreateNote" component={CreateNoteScreen} options={defaultStackNavigationOptions}/>
         </Stack.Navigator>
       </NavigationContainer>
   );

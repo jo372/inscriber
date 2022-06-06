@@ -6,7 +6,6 @@ import { Button } from "react-native-paper";
 import Woman from '../../assets/images/woman.jpg';
 import Container from "../../components/container/Container";
 import { RootStackParamList } from "../../configs/Application";
-import Logger from '../../lib/handlers/Logger';
 import URLHandler from "../../lib/handlers/URLHandler";
 import AccountManager from '../../lib/managers/AccountManager';
 import { fadeInDown, fadeInLeft, fadeInUp } from "../../utils/animations";
@@ -34,7 +33,6 @@ export default function FirstTimeSetupScreen(props: FirstTimeSetupScreenProps) {
 
   React.useEffect(() => {
     AccountManager.hasSession(redirectToHome);
-    Logger.log("hasSession", AccountManager.isUserLoggedIn());
   }, []);
 
   return (
@@ -58,11 +56,6 @@ export default function FirstTimeSetupScreen(props: FirstTimeSetupScreenProps) {
       >
         Sign up
       </Button>
-      <Animatable.Text 
-        style={link}
-        animation={fadeInDown}
-        onPress={() => navigation.push('Home')}  
-      >Use without an account</Animatable.Text>
       <Animatable.Text animation={fadeInDown}>
         Have an account? Login <Text style={link} onPress={() => navigation.push('Login')}>here</Text>
       </Animatable.Text>
